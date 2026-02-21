@@ -1,0 +1,50 @@
+{% load static %}
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>QuickCare Pharmacy Portal</title>
+    <link rel="stylesheet" href="{% static 'static/style.css' %}" />
+  </head>
+  <body>
+    <header>
+      <h1>QuickCare Pharmacy</h1>
+      <input
+        type="text"
+        id="medSearch"
+        placeholder="Search medicines (e.g. Paracetamol)..."
+        onkeyup="searchMedicine()"
+      />
+    </header>
+
+    <main class="container">
+      <section id="inventory">
+        <h2>Available Medicines</h2>
+        <div id="medicineGrid" class="grid"></div>
+      </section>
+
+      <aside>
+        <div class="card">
+          <h3>Live Sales Feed</h3>
+          <ul id="salesFeed"></ul>
+        </div>
+
+        <div class="card">
+          <h3>Book Doctor Appointment</h3>
+          <form id="bookingForm">
+            <select id="doctorSelect" required>
+              <option value="">Select a Doctor</option>
+            </select>
+            <input type="text" id="custName" placeholder="Your Name" required />
+            <input type="datetime-local" id="appDate" required />
+            <button type="submit">Confirm Booking</button>
+          </form>
+        </div>
+      </aside>
+    </main>
+
+    <script src="{% static 'static/script.js' %}?v=2"></script>
+  </body>
+</html>

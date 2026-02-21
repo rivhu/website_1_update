@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Akash's Pharmacy - Home</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'style.css' %}" />
+  </head>
+  <body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+      <div class="container">
+        <div class="logo">
+          <h1>Akash's Ayurvedic Pharmacy</h1>
+        </div>
+        <ul class="nav-links">
+          <li><a href="#top-medicines">Top Medicines</a></li>
+          <li><a href="#doctors">Our Doctors</a></li>
+          <li><a href="#all-medicines">All Medicines</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="hero-content">
+        <h1>Welcome to Ayurvedic Pharmacy</h1>
+        <p>
+          Your trusted destination for quality medicines and healthcare services
+        </p>
+      </div>
+    </section>
+
+    <!-- Top 5 Medicines Section -->
+    <section id="top-medicines" class="section">
+      <div class="container">
+        <h2 class="section-title">Top 5 Best Sellers</h2>
+        <div class="medicines-grid">
+          {% for med in top_medicines %}
+          <div class="medicine-card">
+            {% if med.image %}
+            <div class="medicine-image">
+              <img src="{{ med.image.url }}" alt="{{ med.name }}" />
+              <div class="medicine-badge">Best Seller</div>
+            </div>
+            {% else %}
+            <div class="medicine-image no-image">
+              <p>No Image</p>
+            </div>
+            {% endif %}
+            <div class="medicine-info">
+              <h3>{{ med.name }}</h3>
+              <p class="description">{{ med.description|truncatewords:15 }}</p>
+              <div class="medicine-footer">
+                <span class="price">₹{{ med.price }}</span>
+              </div>
+              <button
+                class="btn btn-primary"
+                onclick="addToCart('{{ med.name }}', {{ med.price }})"
+              >
+                Add to Cart
+              </button>
+            </div>
+          </div>
+          {% empty %}
+          <p class="no-data">No top sellers yet. Check back soon!</p>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+
+    <!-- Doctors Section -->
+    <section id="doctors" class="section bg-light">
+      <div class="container">
+        <h2 class="section-title">Our Medical Professionals</h2>
+        <div class="doctors-grid">
+          {% for doctor in doctors %}
+          <div class="doctor-card">
+            <div class="doctor-avatar">{{ doctor.name|first }}</div>
+            <h3>{{ doctor.name }}</h3>
+            <p class="specialty">{{ doctor.specialty }}</p>
+            <span class="badge available">Available</span>
+            <button
+              class="btn btn-secondary"
+              onclick="openAppointmentModal({{ doctor.id }}, '{{ doctor.name }}')"
+            >
+              Book Appointment
+            </button>
+          </div>
+          {% empty %}
+          <p class="no-data">No doctors available at the moment.</p>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+
+    <!-- All Medicines Section -->
+    <section id="all-medicines" class="section">
+      <div class="container">
+        <h2 class="section-title">All Available Medicines</h2>
+        <div class="medicines-list">
+          <table class="medicines-table">
+            <thead>
+              <tr>
+                <th>Medicine Name</th>
+                <th>Description</th>
+                <th>Price</th>
+                <th>Stock</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for med in medicines %}
+              <tr>
+                <td><strong>{{ med.name }}</strong></td>
+                <td>{{ med.description|truncatewords:10 }}</td>
+                <td>₹{{ med.price }}</td>
+                <td>
+                  <span
+                    class="stock-badge {% if med.stock_quantity > 0 %}in{% else %}out{% endif %}"
+                  >
+                    {{ med.stock_quantity }}
+                  </span>
+                </td>
+                <td>
+                  <button
+                    class="btn btn-small"
+                    onclick="addToCart('{{ med.name }}', {{ med.price }})"
+                  >
+                    Add
+                  </button>
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="5" class="no-data">No medicines available.</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Appointment Modal -->
+    <div id="appointmentModal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeAppointmentModal()">&times;</span>
+        <h2>Book an Appointment</h2>
+        <p style="color: #7f8c8d; margin-bottom: 1.5rem">
+          Please enter '9230130888' to proceed with appointment booking. 
+           OTP verification on the next page.
+        </p>
+        <input type="hidden" id="doctorId" />
+        <input type="hidden" id="doctorName" />
+        <div class="form-group" style="margin-bottom: 1.5rem">
+          <label
+            for="modalPhone"
+            style="display: block; margin-bottom: 0.5rem; font-weight: 600"
+            >Phone Number:</label
+          >
+          <input
+            type="tel"
+            id="modalPhone"
+            placeholder="enter '9230130888' "
+            required
+            style="
+              width: 100%;
+              padding: 0.75rem;
+              border: 1px solid #bdc3c7;
+              border-radius: 6px;
+              font-size: 1rem;
+            "
+          />
+          <small style="color: #7f8c8d; display: block; margin-top: 0.25rem"
+            >Enter a 10+ digit phone number</small
+          >
+        </div>
+        <button
+          class="btn btn-primary full-width"
+          onclick="proceedWithPhone()"
+          style="margin-bottom: 0.5rem"
+        >
+          Proceed to Book Appointment
+        </button>
+        <button
+          type="button"
+          class="btn btn-secondary full-width"
+          onclick="closeAppointmentModal()"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+
+    <!-- Cart Notification -->
+    <div id="cartNotification" class="cart-notification">
+      <p id="notificationText"></p>
+    </div>
+
+    {% load static %}
+    <script src="{% static 'script.js' %}?v=2"></script>
+    <script>
+      function proceedWithPhone() {
+        const phone = document.getElementById("modalPhone").value.trim();
+        if (!phone) {
+          alert("Please enter a phone number");
+          return;
+        }
+        if (phone.replace(/\D/g, "").length < 10) {
+          alert("Please enter a valid phone number (at least 10 digits)");
+          return;
+        }
+        const doctorId = document.getElementById("doctorId").value;
+        const doctorName = document.getElementById("doctorName").value;
+        const params = new URLSearchParams({
+          phone: phone,
+          doctor_id: doctorId,
+          doctor_name: doctorName,
+        });
+        window.location.href = `/book-appointment/?${params.toString()}`;
+      }
+    </script>
+  </body>
+</html>
